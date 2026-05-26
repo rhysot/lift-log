@@ -135,6 +135,29 @@
   .steps-pill:active { transform: scale(0.96); }
   .steps-pill.has-steps b { color: var(--accent); }
 
+  /* Past-date editing banner */
+  .past-date-banner {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--accent); color: #0e1014;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 18px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    font-weight: 600;
+    box-shadow: 0 4px 12px -4px rgba(0,0,0,0.4);
+  }
+  .past-date-banner b { font-weight: 700; margin-left: 4px; }
+  .past-date-banner button {
+    background: rgba(14,16,20,0.18);
+    border: 1px solid rgba(14,16,20,0.3);
+    color: #0e1014;
+    padding: 4px 12px; border-radius: 999px;
+    font-family: inherit; font-size: 10px; letter-spacing: 0.14em;
+    font-weight: 700; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .past-date-banner button:hover { background: rgba(14,16,20,0.3); }
+
   /* Calendar button in header */
   .cal-btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -196,7 +219,7 @@
   .cal-day.rest { background: var(--surface); color: var(--ink-faint); }
   .cal-day.full { background: var(--accent); color: #0e1014; font-weight: 600; }
   .cal-day.partial { background: #d4a01c; color: #0e1014; font-weight: 600; }
-  .cal-day.missed { background: var(--bg-3); border-color: var(--line); color: var(--ink-faint); }
+  .cal-day.missed { background: rgba(255, 110, 110, 0.18); border-color: rgba(255, 110, 110, 0.4); color: rgba(255, 110, 110, 0.85); }
   .cal-day.future { color: var(--ink-faint); opacity: 0.4; }
   .cal-day.today { box-shadow: 0 0 0 2px var(--ink); }
   .cal-day.full.today, .cal-day.partial.today { box-shadow: 0 0 0 2px var(--ink); }
@@ -207,11 +230,39 @@
   .cal-day .has-habits {
     position: absolute; bottom: 4px; right: 4px;
     width: 5px; height: 5px; border-radius: 50%;
+  }
+  .cal-day .has-habits.all {
     background: var(--accent);
     box-shadow: 0 0 4px var(--accent);
   }
-  .cal-day.full .has-habits, .cal-day.partial .has-habits {
+  .cal-day .has-habits.partial {
+    background: rgba(200, 255, 46, 0.35);
+    box-shadow: none;
+  }
+  .cal-day.full .has-habits.all,
+  .cal-day.partial .has-habits.all {
     background: #0e1014; box-shadow: none;
+  }
+  .cal-day.full .has-habits.partial,
+  .cal-day.partial .has-habits.partial {
+    background: rgba(14, 16, 20, 0.35); box-shadow: none;
+  }
+  /* Note indicator: small bookmark-style mark in top-left corner */
+  .cal-day .has-note {
+    position: absolute; top: 4px; left: 4px;
+    width: 6px; height: 8px;
+    border-radius: 1px;
+    background: var(--ink-dim);
+    opacity: 0.7;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+  }
+  .cal-day.full .has-note,
+  .cal-day.partial .has-note {
+    background: #0e1014; opacity: 0.7;
+  }
+  .cal-day.missed .has-note {
+    background: rgba(255, 110, 110, 0.85);
+    opacity: 1;
   }
 
   .calendar-legend {
@@ -230,7 +281,7 @@
   .calendar-legend .swatch.full { background: var(--accent); }
   .calendar-legend .swatch.partial { background: #d4a01c; }
   .calendar-legend .swatch.rest { background: var(--surface); border: 1px solid var(--line); }
-  .calendar-legend .swatch.missed { background: var(--bg-3); border: 1px solid var(--line); }
+  .calendar-legend .swatch.missed { background: rgba(255, 110, 110, 0.18); border: 1px solid rgba(255, 110, 110, 0.4); }
 
   /* Day-detail view */
   .day-detail-section {
@@ -285,6 +336,20 @@
   .day-detail-stat-val .unit {
     font-size: 11px; color: var(--ink-dim);
   }
+  .day-detail-steps-input {
+    background: transparent; border: none; outline: none;
+    color: var(--ink);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 0.02em;
+    width: 100%; padding: 0;
+    -moz-appearance: textfield;
+  }
+  .day-detail-steps-input::-webkit-outer-spin-button,
+  .day-detail-steps-input::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  .day-detail-steps-input::placeholder { color: var(--ink-faint); }
+  .day-detail-steps-input:focus { color: var(--accent); }
   .day-detail-habit-row {
     display: flex; align-items: center; gap: 10px;
     padding: 8px 0;
@@ -309,6 +374,47 @@
     transition: all 0.15s;
   }
   .day-detail-back:active { color: var(--accent); border-color: var(--accent); }
+  .day-detail-edit-btn {
+    background: transparent;
+    border: 1px dashed var(--accent);
+    color: var(--accent);
+    padding: 10px 14px; width: 100%;
+    border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer; margin-top: 10px;
+    transition: all 0.15s;
+  }
+  .day-detail-edit-btn:hover { background: var(--accent-soft); }
+  .day-detail-edit-btn:active { transform: scale(0.98); }
+  .day-detail-notes {
+    width: 100%; min-height: 90px;
+    background: var(--bg-3); border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px; line-height: 1.5;
+    padding: 12px 14px;
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+  .day-detail-notes:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .day-detail-notes::placeholder {
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+  .day-detail-notes-readonly {
+    background: var(--bg-3); border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px; line-height: 1.5;
+    padding: 12px 14px;
+    white-space: pre-wrap;
+  }
 
   /* Sync pill in header */
   .sync-pill { cursor: pointer; transition: all 0.15s; }
@@ -1264,6 +1370,11 @@
   <div class="tabs" id="tabs"></div>
 </header>
 
+<div id="past-date-banner" class="past-date-banner" style="display:none;">
+  <span>EDITING <b id="past-date-banner-label">—</b></span>
+  <button onclick="exitPastDateMode()">EXIT</button>
+</div>
+
 <main id="main">
   <div class="day-header">
     <div class="day-title" id="day-title"></div>
@@ -1384,6 +1495,8 @@ function ensureSchema(s) {
   if (!s.foodLog) s.foodLog = {};
   // foodTargets: { kcal: number, protein: number }
   if (!s.foodTargets) s.foodTargets = { kcal: 2200, protein: 150 };
+  // Notes: { 'YYYY-MM-DD': 'free text' } — optional per-day journal entry
+  if (!s.dayNotes) s.dayNotes = {};
   return s;
 }
 // Backwards-compat alias for code that still calls migrateToV3
@@ -1435,7 +1548,12 @@ function _localDateKey(d) {
   return `${y}-${m}-${day}`;
 }
 function todayKey() { return _localDateKey(new Date()); }
-function todaySessionKey(dayId) { return `${todayKey()}__${dayId}`; }
+
+// When non-null, the user is editing a past day. All session reads/writes
+// for the workout view use this date instead of today.
+let viewingPastDate = null;
+function activeSessionDateKey() { return viewingPastDate || todayKey(); }
+function todaySessionKey(dayId) { return `${activeSessionDateKey()}__${dayId}`; }
 
 function getLastSession(exId, excludeKey) {
   const entries = Object.entries(store.sessions)
@@ -1901,8 +2019,16 @@ function renderCalendar() {
     const d = new Date(cm.year, cm.month, day);
     const key = _localDateKey(d);
     const klass = classifyDay(key);
-    const hasHabits = !!(store.habitLog && store.habitLog[key] && Object.keys(store.habitLog[key]).length > 0);
-    cells.push({ day, key, klass, hasHabits, isToday: key === today });
+    // Habit state: 'none' | 'partial' | 'all'
+    const totalHabits = (store.habits || []).length;
+    const dayLog = (store.habitLog || {})[key] || {};
+    const doneCount = Object.keys(dayLog).length;
+    let habitState = 'none';
+    if (totalHabits > 0 && doneCount > 0) {
+      habitState = doneCount >= totalHabits ? 'all' : 'partial';
+    }
+    const hasNote = !!((store.dayNotes || {})[key] && (store.dayNotes || {})[key].trim());
+    cells.push({ day, key, klass, habitState, hasNote, isToday: key === today });
   }
 
   // Can we go forward? Only if we're not on the current month
@@ -1930,8 +2056,11 @@ function renderCalendar() {
         if (c.isToday) classes.push('today');
         return `
           <div class="${classes.join(' ')}" onclick="openDayDetail('${c.key}')">
+            ${c.hasNote ? '<span class="has-note" title="Has note"></span>' : ''}
             <span class="dnum">${c.day}</span>
-            ${c.hasHabits ? '<span class="has-habits"></span>' : ''}
+            ${c.habitState === 'all' ? '<span class="has-habits all"></span>'
+              : c.habitState === 'partial' ? '<span class="has-habits partial"></span>'
+              : ''}
           </div>
         `;
       }).join('')}
@@ -1942,7 +2071,9 @@ function renderCalendar() {
       <div class="item"><div class="swatch partial"></div>Partial</div>
       <div class="item"><div class="swatch rest"></div>Rest</div>
       <div class="item"><div class="swatch missed"></div>Skipped</div>
-      <div class="item"><div class="swatch" style="background:var(--accent);box-shadow:0 0 4px var(--accent);width:5px;height:5px;border-radius:50%;align-self:center;"></div>Habits</div>
+      <div class="item"><div class="swatch" style="background:var(--accent);box-shadow:0 0 4px var(--accent);width:5px;height:5px;border-radius:50%;align-self:center;"></div>All habits</div>
+      <div class="item"><div class="swatch" style="background:rgba(200,255,46,0.35);width:5px;height:5px;border-radius:50%;align-self:center;"></div>Some habits</div>
+      <div class="item"><div class="swatch" style="background:var(--ink-dim);opacity:0.7;width:6px;height:8px;border-radius:1px;clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%);align-self:center;"></div>Note</div>
     </div>
   `;
 }
@@ -1968,17 +2099,71 @@ window.calNext = function() {
 
 window.openDayDetail = function(dateKey) {
   openSheet(renderDayDetail(dateKey));
+  attachDayDetailHandlers();
 };
 
 window.backToCalendar = function() {
   openSheet(renderCalendar());
 };
 
+// ============ PAST-DATE EDITING ============
+window.enterPastDateMode = function(dateKey, jumpTo) {
+  viewingPastDate = dateKey;
+  // Switch the currentDayId to whichever routine day matches that date's weekday
+  const d = new Date(dateKey + 'T00:00:00');
+  const weekdayIdx = (d.getDay() + 6) % 7;
+  const routineDay = (store.routine.days || []).find(x => x.weekday === weekdayIdx);
+  if (routineDay) {
+    currentDayId = routineDay.id;
+  }
+  // Show the banner
+  updatePastDateBanner();
+  // Re-render top-level UI
+  renderTabs();
+  renderWorkout();
+  closeSheet();
+  // If user wanted to jump straight to Food
+  if (jumpTo === 'food') {
+    currentFoodDate = dateKey;
+    setTimeout(() => {
+      const foodBtn = document.querySelector('.nav-btn[data-view="food"]');
+      if (foodBtn) foodBtn.click();
+    }, 50);
+  }
+};
+
+window.exitPastDateMode = function() {
+  viewingPastDate = null;
+  // Reset currentDayId to today's actual routine day
+  const todayIdx = todayWeekdayIdx();
+  const todayDay = (store.routine.days || []).find(d => d.weekday === todayIdx);
+  if (todayDay) currentDayId = todayDay.id;
+  updatePastDateBanner();
+  renderTabs();
+  renderWorkout();
+  closeSheet();
+};
+
+function updatePastDateBanner() {
+  const banner = document.getElementById('past-date-banner');
+  const label = document.getElementById('past-date-banner-label');
+  if (!banner) return;
+  if (viewingPastDate) {
+    banner.style.display = 'flex';
+    const d = new Date(viewingPastDate + 'T00:00:00');
+    label.textContent = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
 function renderDayDetail(dateKey) {
   const d = new Date(dateKey + 'T00:00:00');
   const dateLabel = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const weekdayIdx = (d.getDay() + 6) % 7;
   const routineDay = (store.routine.days || []).find(x => x.weekday === weekdayIdx);
+  const isToday = dateKey === todayKey();
+  const isFuture = dateKey > todayKey();
 
   // Workout section
   let workoutHtml = '';
@@ -2014,7 +2199,6 @@ function renderDayDetail(dateKey) {
 
   // Food section
   const foodLog = (store.foodLog || {})[dateKey];
-  let foodHtml = '';
   let foodKcal = 0, foodProt = 0;
   if (foodLog) {
     MEAL_CATEGORIES.forEach(c => {
@@ -2032,6 +2216,20 @@ function renderDayDetail(dateKey) {
   const habits = store.habits || [];
   const habitLog = (store.habitLog || {})[dateKey] || {};
 
+  // Edit buttons only for past or today, not future
+  const showEditButtons = !isFuture;
+  const editWorkoutBtn = (routineDay && !routineDay.rest && showEditButtons) ? `
+    <button class="day-detail-edit-btn" onclick="enterPastDateMode('${dateKey}')">
+      ✎ ${isToday ? 'Go to Workout' : 'Edit this workout'}
+    </button>
+  ` : '';
+
+  const editFoodBtn = showEditButtons ? `
+    <button class="day-detail-edit-btn" onclick="enterPastDateMode('${dateKey}', 'food')">
+      ✎ ${isToday ? 'Go to Food' : 'Edit food log'}
+    </button>
+  ` : '';
+
   return `
     <h2>${dateLabel.toUpperCase()}</h2>
 
@@ -2044,9 +2242,11 @@ function renderDayDetail(dateKey) {
         <div class="day-detail-stat-label">Protein</div>
         <div class="day-detail-stat-val">${Math.round(foodProt) || '—'}${foodProt ? '<span class="unit">g</span>' : ''}</div>
       </div>
-      <div class="day-detail-stat">
-        <div class="day-detail-stat-label">Steps</div>
-        <div class="day-detail-stat-val">${steps ? steps.toLocaleString() : '—'}</div>
+      <div class="day-detail-stat day-detail-steps-stat">
+        <div class="day-detail-stat-label">Steps ${showEditButtons ? '✎' : ''}</div>
+        ${showEditButtons
+          ? `<input type="number" inputmode="numeric" class="day-detail-steps-input" data-date="${dateKey}" value="${steps || ''}" placeholder="—" onclick="event.stopPropagation();">`
+          : `<div class="day-detail-stat-val">${steps ? steps.toLocaleString() : '—'}</div>`}
       </div>
       <div class="day-detail-stat">
         <div class="day-detail-stat-label">Habits</div>
@@ -2057,15 +2257,26 @@ function renderDayDetail(dateKey) {
     <div class="day-detail-section">
       <h3>Workout</h3>
       ${workoutHtml}
+      ${editWorkoutBtn}
+    </div>
+
+    <div class="day-detail-section">
+      <h3>Food</h3>
+      <div class="day-detail-empty" style="margin-bottom:8px;">
+        ${foodLog && Object.values(foodLog).some(arr => arr.length > 0)
+          ? `${Math.round(foodKcal)} kcal · ${Math.round(foodProt)}g protein logged`
+          : 'No food logged this day.'}
+      </div>
+      ${editFoodBtn}
     </div>
 
     ${habits.length > 0 ? `
       <div class="day-detail-section">
-        <h3>Habits</h3>
+        <h3>Habits ${showEditButtons ? '<span style="font-size:10px;color:var(--ink-faint);letter-spacing:0.1em;">— tap to toggle</span>' : ''}</h3>
         ${habits.map(h => {
           const done = !!habitLog[h.id];
           return `
-            <div class="day-detail-habit-row ${done ? 'done' : ''}">
+            <div class="day-detail-habit-row ${done ? 'done' : ''}" ${showEditButtons ? `onclick="toggleHabitForDate('${h.id}', '${dateKey}')"` : ''} style="${showEditButtons ? 'cursor:pointer;' : ''}">
               <div class="tick">
                 ${done ? `<svg viewBox="0 0 24 24" fill="none" stroke="#0e1014" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
               </div>
@@ -2076,8 +2287,58 @@ function renderDayDetail(dateKey) {
       </div>
     ` : ''}
 
+    <div class="day-detail-section">
+      <h3>Notes ${showEditButtons ? '<span style="font-size:10px;color:var(--ink-faint);letter-spacing:0.1em;">— optional</span>' : ''}</h3>
+      ${showEditButtons
+        ? `<textarea class="day-detail-notes" data-date="${dateKey}" placeholder="How did the workout go? Why you skipped, anything to remember...">${escapeAttr((store.dayNotes || {})[dateKey] || '')}</textarea>`
+        : ((store.dayNotes || {})[dateKey]
+            ? `<div class="day-detail-notes-readonly">${escapeAttr((store.dayNotes || {})[dateKey])}</div>`
+            : `<div class="day-detail-empty">No note.</div>`)}
+    </div>
+
     <button class="day-detail-back" onclick="backToCalendar()">‹ Back to calendar</button>
   `;
+}
+
+window.toggleHabitForDate = function(habitId, dateKey) {
+  toggleHabit(habitId, dateKey);
+  // Re-render the day detail to reflect the change
+  openSheet(renderDayDetail(dateKey));
+  attachDayDetailHandlers();
+};
+
+function attachDayDetailHandlers() {
+  // Steps input: save on each keystroke, no popup
+  document.querySelectorAll('.day-detail-steps-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const dateKey = inp.dataset.date;
+      if (!store.dailySteps) store.dailySteps = {};
+      const v = inp.value.trim();
+      if (v === '') {
+        delete store.dailySteps[dateKey];
+      } else {
+        const n = parseInt(v, 10);
+        if (!isNaN(n) && n >= 0) {
+          store.dailySteps[dateKey] = n;
+        }
+      }
+      saveStore();
+    });
+  });
+  // Notes textarea: auto-save as you type
+  document.querySelectorAll('.day-detail-notes').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const dateKey = ta.dataset.date;
+      if (!store.dayNotes) store.dayNotes = {};
+      const v = ta.value;
+      if (v.trim() === '') {
+        delete store.dayNotes[dateKey];
+      } else {
+        store.dayNotes[dateKey] = v;
+      }
+      saveStore();
+    });
+  });
 }
 
 // ============ HISTORY ============
